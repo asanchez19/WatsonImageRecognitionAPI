@@ -4,6 +4,8 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const cookie = require('cookie-parser');
 const body = require('body-parser');
+var multer = require('multer');
+var upload = multer();
 const { main } = require('../routes');
 
 /*
@@ -38,15 +40,17 @@ exports.HTTP = class HTTP {
     this.app.use(cors())
     this.app.use(helmet())
     this.app.disable('x-powered-by')
+    /** Permissible loading a single file, 
+    the value of the attribute "name" in the form of "recfile". **/
+    const type = upload.single('image');
 
     //Route configuration
-    this.app.use('/', main)
+    this.app.use('/', type, main)
 
 
     await new Promise((resolve) => {
       let { httpPort, httpHost } = this.config;
       this.server = this.app.listen(httpPort, httpHost, resolve);
-      //Cron.initCronJobs();
     });
   }
 
